@@ -434,8 +434,18 @@ function review(overrides = {}) {
 }
 
 test("readTrustedBots reads the per-machine bot list and defaults to none", () => {
-  assert.deepEqual(readTrustedBots(undefined), {});
-  assert.deepEqual(readTrustedBots(JSON.stringify(trustedBots)), trustedBots);
+  // Calling with undefined falls through to the real BABYSIT_TRUSTED_BOTS, so
+  // clear it for the duration to keep the test independent of this machine.
+  const saved = process.env.BABYSIT_TRUSTED_BOTS;
+  delete process.env.BABYSIT_TRUSTED_BOTS;
+  try {
+    assert.deepEqual(readTrustedBots(), {});
+    assert.deepEqual(readTrustedBots(JSON.stringify(trustedBots)), trustedBots);
+  } finally {
+    if (saved !== undefined) {
+      process.env.BABYSIT_TRUSTED_BOTS = saved;
+    }
+  }
 });
 
 test("a bot outside the trusted list is unknown even when it posts a summary", () => {
