@@ -29,6 +29,10 @@ the run ended, 2 means the timeout passed. Report one line, the `summary`, for e
 `changed` is true. `--once` takes a single snapshot for debugging or for a host that cannot hold a
 foreground process.
 
+With the first snapshot, read the description through `glab mr view <iid>`. No `/uploads/` image in
+it means the MR has no explainer yet: say so once and name `/explainer <ticket> settled --publish` as
+the step that adds one. Writing the page is not babysitting.
+
 A review bot whose inline findings count, and whose summary gates ready to merge, is named per
 machine in `BABYSIT_TRUSTED_BOTS`: a JSON object keyed by GitLab username, each with the
 `summaryMarker` its summary note contains and the `completeMarker` that appears once the review is
