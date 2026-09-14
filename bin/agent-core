@@ -1,0 +1,101 @@
+#!/usr/bin/env node
+
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { formatReport, resolveOverlayRoot, runDryRun } from "./dry-run.mjs";
+import { runInstall } from "./install.mjs";
+import { runRestore } from "./restore.mjs";
+
+const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const commands = new Set(["dry-run", "install", "restore"]);
+
+export function parseArguments(arguments_) {
+  const options = { command: "dry-run" };
+  const rest = [...arguments_];
+
+  if (rest[0] && !rest[0].startsWith("-")) {
+    options.command = rest.shift();
+  }
+
+  for (let index = 0; index < rest.length; index += 1) {
+    const argument = rest[index];
+
+    if (argument === "--overlay") {
+      options.overlayRoot = rest[index + 1];
+      index += 1;
+      continue;
+    }
+
+    if (argument === "--home") {
+      options.home = rest[index + 1];
+      index += 1;
+      continue;
+    }
+
+    throw new Error(`Unknown argument: ${argument}`);
+  }
+
+  if (!commands.has(options.command)) {
+    throw new Error(`Unknown command: ${options.command}`);
+  }
+
+  if (Object.hasOwn(options, "overlayRoot") && !options.overlayRoot) {
+    throw new Error("--overlay needs a path");
+  }
+
+  if (Object.hasOwn(options, "home") && !options.home) {
+    throw new Error("--home needs a path");
+  }
+
+  return options;
+}
+
+async function main() {
+  const options = parseArguments(process.argv.slice(2));
+  const overlayRoot = await resolveOverlayRoot({
+    explicit: options.overlayRoot ?? process.env.AGENT_CORE_OVERLAY,
+    fallback: resolve(repositoryRoot, "..", "web"),
+  });
+  const shared = {
+    home: options.home,
+    overlayRoot,
+    root: repositoryRoot,
+  };
+
+  if (options.command === "restore") {
+    const result = await runRestore(shared);
+
+    if (!result.ok) {
+      console.error(result.errors.join("\n"));
+      process.exitCode = 1;
+      return;
+    }
+
+    console.log("Restored previous home links and pinned the personal-core SHA.");
+    return;
+  }
+
+  const result =
+    options.command === "install" ? await runInstall(shared) : await runDryRun(shared);
+  const report = formatReport(result);
+
+  if (!result.ok) {
+    console.error(report);
+    process.exitCode = 1;
+    return;
+  }
+
+  if (options.command === "install") {
+    console.log("Installed personal-core home links.");
+    return;
+  }
+
+  console.log(report);
+}
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+) {
+  await main();
+}

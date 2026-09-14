@@ -1,0 +1,3 @@
+interface:
+  display_name: "Good Push"
+  short_description: "Commit this iteration and push"

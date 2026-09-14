@@ -1,0 +1,5 @@
+interface:
+  display_name: "Merge MR"
+  short_description: "Squash-merge an MR with its message"
+policy:
+  allow_implicit_invocation: false

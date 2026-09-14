@@ -1,0 +1,5 @@
+interface:
+  display_name: "Babysit MR"
+  short_description: "Follow an MR to ready-to-merge, fixing what the branch broke"
+policy:
+  allow_implicit_invocation: false

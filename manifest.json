@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "core": {
+    "guidance": "guidance/AGENTS.personal.md",
+    "skills": "skills"
+  },
+  "clients": {
+    "cursor": {
+      "guidance": {
+        "format": "cursor-rule",
+        "source": "generated/cursor/personal-core.mdc",
+        "home": "~/.cursor/rules/personal-core.mdc"
+      },
+      "skillsHome": "~/.claude/skills",
+      "shadowTree": "~/.cursor/skills"
+    },
+    "claude": {
+      "guidance": {
+        "format": "markdown",
+        "source": "generated/claude/CLAUDE.md",
+        "home": "~/.claude/CLAUDE.md"
+      },
+      "skillsHome": "~/.claude/skills"
+    },
+    "codex": {
+      "guidance": {
+        "format": "markdown",
+        "source": "generated/codex/AGENTS.md",
+        "home": "~/.codex/AGENTS.md"
+      },
+      "skillsHome": "~/.agents/skills"
+    }
+  },
+  "policies": {
+    "collision": "error",
+    "generatedEdit": "error",
+    "overlayMutation": "never",
+    "skillTree": "one-canonical",
+    "installMode": "symlink",
+    "rollback": "previous-home-and-git-sha"
+  }
+}

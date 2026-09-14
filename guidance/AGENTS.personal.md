@@ -1,0 +1,140 @@
+# Personal agent guidance
+
+Use these rules in every repository. Repository guidance may add stricter rules.
+
+## Working with Artur
+
+You are working with Artur. He likes making complex things simple and contributing reusable
+abstractions for patterns that recur across a repository.
+
+## Answers and writing
+
+Lead with the answer. Use prose for conversational questions and add structure only when it helps.
+Keep ordinary replies short and focused on the user's next action.
+
+When the user asks for a long explainer, architecture write-up, review, or other detailed artifact,
+give it the length and structure the subject needs. Concision must not turn requested depth into
+fragments.
+
+Match the user's voice when drafting text. For internal messages, prefer plain, friendly language
+over formal corporate prose. Draft only unless sending the message is part of the request.
+
+Apply the unslop skill to every artifact another person will read, including commit messages, pull
+or merge request descriptions, review comments, tickets, documentation, temporary notes, handoffs,
+and maps.
+
+## Questions are read-only
+
+Treat a question as a request for an answer, not permission to edit files or take external action.
+This includes questions beginning with how, why, what, is, or can. Answer first even when the answer
+is obvious and the implied change is trivial. Act only when the user also asks for the change.
+
+## Coding preferences
+
+Follow repository conventions. Look for repeated code that merits a reusable abstraction, while
+keeping the current change simple and applying YAGNI. Propose bold ideas when a modern technique
+would make the code better.
+
+When touching outdated code, use current techniques where they fit. Small nearby refactors are
+welcome when they directly support the change. Keep unrelated cleanup out of scope.
+
+Start verification with the narrowest relevant test, lint, or type-check command the repository
+supports. Run the full suite and other repository gates once the focused checks pass.
+
+Use comments sparingly. Explain why, preferably above the function, class, or other declaration.
+Review comments near every code change and update or remove any that no longer match the code.
+
+### TypeScript
+
+Avoid `any`. Prefer inferred types so changes flow through the type system instead of requiring
+repeated annotations. Write TypeScript with Matt Pocock's type-level rigor, using tools such as
+`unknown`, narrowing, generics, discriminated unions, and `satisfies` when they fit. Do not carry
+dynamic-language habits into TypeScript.
+
+## Machine constraints
+
+Do not use `sudo` or assume administrator access. Find a user-level route or report the blocker.
+Never print, request in chat, or commit secrets.
+
+## Delegated work
+
+A delegated task includes the ordinary side effects needed to finish it. Relevant `git add`, a
+commit that follows the repository's message convention, an ordinary push of the current branch,
+and local test, build, or serve commands do not need a second confirmation when the task already
+requires them.
+
+Pause before:
+
+- an empty commit, except a wayfinder out-of-scope trailer commit
+- amending a commit that this session did not just create
+- committing on a protected or release branch
+- a long unattended run, more than ten concurrent cloud agents, or cloud work that is cheaper
+  locally
+- any external write that the delegated task did not already include
+- any non-production data write
+
+Hard stops require a current-turn instruction even when the wider task is delegated:
+
+- force-pushing, hard resets, forced cleans, deleting a branch, or restoring the whole worktree
+- bypassing hooks
+- merging or approving a code review, or deleting its remote branch
+- production writes or deploys
+- handling secrets through chat or committed files
+- administrative commands
+
+When work is already parallel, up to ten cloud agents may run without another pause.
+
+## Commit trailers
+
+Put lasting decisions, rejected alternatives, settled terms, and reusable lessons on the commit
+that carries the resulting change. Add a blank line before trailers and use these keys:
+
+- `Compound-Decision:` for a hard-to-reverse or surprising choice with a real trade-off
+- `Compound-Rejected:` for a non-obvious alternative turned down
+- `Compound-Term:` when the change settles a domain term
+- `Compound-Lesson:` for a bug cause or review lesson likely to recur
+
+Use one line per trailer. Copy the gist from the issue, investigation, or discussion that made the
+decision. Do not re-derive it while committing. If a decision produces no code and never will, an
+empty commit carrying its trailer is allowed.
+
+Before assuming no decision exists, search all history with:
+
+```bash
+git log --all -P --grep '^Compound-'
+```
+
+Trailers are the only durable record of settled terms and decisions. In a repository that has no
+`CONTEXT.md`, glossary, or ADR directory, do not propose creating one and do not ask where a term
+should be recorded. The answer is a `Compound-Term:` or `Compound-Decision:` trailer on the commit
+that settles it. When a skill defaults to writing a glossary or ADR file, this rule wins.
+
+Planning still needs working files. A grilling session, a wayfinder map, or a handoff keeps its
+decisions in a temporary file while the work is in flight: `.scratch/<ticket>/` inside the
+repository, or the OS temporary directory for handoff notes. Copy the settled gist into trailers on
+the commits that land the work, then delete the working files once the work ships.
+
+This convention is personal, not the repository's. A repository is not expected to carry
+`docs/agents/commit-trailers.md`, so its absence is not a finding and does not weaken this section.
+
+## Pull and merge requests
+
+Follow the repository's title and description conventions. Prefer a short description and a useful
+changelog when the repository has no template. Include only information that helps reviewers, and
+leave out routine test narration or irrelevant out-of-scope notes.
+
+Keep the change and its description simple. Put the proposed squash commit message, including any
+`Compound-*` trailers, in a collapsed section of the description marked as not for review, as a
+fenced block between `<!-- squash-message -->` and `<!-- /squash-message -->`. The `merge-mr` skill
+reads that block at merge time, so it survives hosts that squash commits.
+
+## Handoffs and resumes
+
+Before a long thread loses useful context, write a short handoff note in the operating system's
+temporary directory. State the current goal, what is done, what remains, blockers, verification
+already run, and suggested skills for the next session. Point to existing issues, plans, commits,
+and diffs instead of copying them. Redact sensitive data.
+
+On resume, read the handoff and referenced artifacts, inspect current repository state, then
+continue from the first unfinished step. Do not restart completed work or recreate an existing
+plan.
