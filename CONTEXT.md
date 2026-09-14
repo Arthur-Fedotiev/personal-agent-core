@@ -57,7 +57,8 @@ A skill that runs only when the user names it. Other skills cannot fire it.
 **Babysit**:
 Keep an MR moving after it is opened: follow its pipeline, review threads, and mergeability until
 it is ready to merge, blocked on a person, or merged. Fixes for branch-caused failures and
-addressed review threads are part of babysitting. The merge itself is not; it belongs to the
+addressed review threads are part of babysitting, as is the opening self-review: one
+`code-reviewer` agent dispatch at watch start. The merge itself is not; it belongs to the
 `merge-mr` skill.
 _Avoid_: watch (that is the pipeline-only poll a host plugin offers), monitor
 

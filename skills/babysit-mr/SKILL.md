@@ -16,6 +16,13 @@ can clear; when the MR is merged or closed; or at the timeout. Merging is not pa
 
 ### 1. Watch
 
+Dispatch the `code-reviewer` agent on the same MR in the background first — once per babysit run,
+so the self-review runs while the pipeline does. Re-dispatching on a later babysit of the same MR
+is safe: the agent skips findings already raised. It posts inline comments as the user, so they
+arrive on later polls as `own_request` items and follow the write policy like any other thread.
+Only Claude Code has that agent: on another host, say so once and watch without it. A `--once`
+snapshot gets no dispatch.
+
 Run in the foreground from a shell inside the target repository, so glab resolves the project. The
 script lives in `scripts/babysit.mjs` under this skill's base directory.
 
