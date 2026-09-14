@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="only light">
+<title>ABC-123 · One-line page title</title>
+<style>
+  /* ---- tokens ---- */
+  :root {
+    --fg:#1f2328; --muted:#59636e; --line:#d0d7de; --bg:#fff; --code:#f6f8fa; --link:#0969da;
+    --ok:#1a7f37; --bad:#cf222e; --warn:#9a6700;
+    --okbg:#dafbe1; --badbg:#ffebe9; --mark:#fff3b0;
+    --mono: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* ---- page frame: 940px column, fills a 1000px render, centred in a wider window ---- */
+  body { font: 15px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: var(--fg); background: var(--bg);
+         max-width: 940px; margin: 0 auto; padding: 28px 30px 40px; counter-reset: section; }
+  h1 { font-size: 22px; margin: 0 0 2px; }
+  h2 { font-size: 17px; margin: 28px 0 8px; padding-bottom: 5px; border-bottom: 1px solid var(--line); }
+  h2::before { counter-increment: section; content: counter(section) ". "; }
+  h2 small { font-size: 14px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+  h3 { font-size: 14px; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  a { color: var(--link); }
+  ul, ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 2px 0; }
+  .meta { color: var(--muted); margin: 0 0 6px; }
+  .meta a { color: inherit; }
+
+  /* ---- core components ---- */
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+  th, td { text-align: left; padding: 5px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  code, pre { font: var(--mono); }
+  code { background: var(--code); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--code); padding: 10px 14px; border-radius: 6px; margin: 8px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  pre code { background: none; padding: 0; }
+  mark { background: var(--mark); }
+  .ok { color: var(--ok); font-weight: 600; }
+  .bad { color: var(--bad); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  .muted { color: var(--muted); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .two > *, .flow > * { min-width: 0; }
+  .callout { border-left: 4px solid var(--warn); padding: 7px 14px; background: var(--code); border-radius: 0 6px 6px 0; margin: 10px 0; }
+  .shot img { display: block; max-width: 100%; border: 1px solid var(--line); }
+
+  /* ---- diagram components ---- */
+  /* .flow: one row of equal steps. .lanes: vertical flows side by side, .arr between steps. */
+  .flow { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 10px; margin: 10px 0; }
+  .step { border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; background: var(--bg); }
+  .step b { display: block; margin-bottom: 3px; }
+  .step small, .step .where { display: block; color: var(--muted); }
+  .step .where { font: var(--mono); font-size: 12px; margin-top: 3px; }
+  .step.ok, .step.bad, .step.muted, .card.ok, .card.bad, td.ok, td.bad, td.warn { color: var(--fg); font-weight: 400; }
+  .step.ok { border-color: var(--ok); background: var(--okbg); }
+  .step.bad { border-color: var(--bad); background: var(--badbg); }
+  .step.muted { border-color: var(--muted); background: var(--code); }
+  .lanes { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; margin: 10px 0; }
+  .lane { flex: 1 1 280px; min-width: 0; }
+  .lane h3 { margin: 0 0 8px; }
+  .arr { text-align: center; color: var(--muted); line-height: 1.1; margin: 2px 0; }
+  /* .row of .card: captioned boxes side by side; .card.ok / .card.bad colour the caption */
+  .row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; margin: 10px 0; }
+  .card { border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+  .card > .cap { padding: 6px 10px; font-weight: 600; font-size: 13px; border-bottom: 1px solid var(--line); background: var(--code); border-radius: 6px 6px 0 0; }
+  .card.bad > .cap { color: var(--bad); }
+  .card.ok > .cap { color: var(--ok); }
+  .card > .body { padding: 14px; }
+  .lbl { font-size: 12px; color: var(--muted); margin: 10px 0 2px; }
+  /* .bar of .seg: width math */
+  .bar { display: flex; align-items: stretch; margin: 3px 0 2px; }
+  .seg { border: 1px solid var(--muted); background: var(--bg); text-align: center; padding: 5px 0; box-sizing: border-box; font: var(--mono); font-size: 12px; }
+  .seg.muted { background: var(--code); color: var(--muted); }
+  .seg.bad { background: var(--badbg); border-color: var(--bad); color: var(--bad); }
+  .seg.ok { background: var(--okbg); border-color: var(--ok); color: var(--ok); }
+  .math { font: var(--mono); font-size: 12px; }
+  /* pre.diff: added and removed lines */
+  pre.diff .add, pre.diff .del { display: inline-block; width: 100%; }
+  pre.diff .add { background: var(--okbg); color: #12532a; }
+  pre.diff .del { background: var(--badbg); color: #8f1d1a; }
+  /* table.grid: comparison grid; td.ok / td.bad / td.warn colour a cell's text */
+  table.grid th, table.grid td { border: 1px solid var(--line); }
+  table.grid th { background: var(--code); color: var(--fg); }
+  table.grid td.ok { color: var(--ok); }
+  table.grid td.bad { color: var(--bad); }
+  table.grid td.warn { color: var(--warn); }
+
+  /* ---- mock-up library: real UI reproduced, scoped under .mock so the page font and table rules stay out ---- */
+  .mock { display: inline-block; vertical-align: top; font: 13px/normal Arial, Helvetica, sans-serif; color: #1c2530; }
+  .mock h1, .mock h2, .mock h3, .mock p { margin: 0; padding: 0; border: 0; font-weight: normal; }
+  .mock h2::before { content: none; }
+  .mock table { width: auto; margin: 0; }
+  .mock th, .mock td { border: 0; padding: 0; color: inherit; font-weight: normal; }
+  .mock button { font: inherit; }
+  .mock .actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; }
+  .mock .actions button { height: 24px; padding: 0 10px; font-size: 12px; }
+  /* .dlg: table dialog */
+  .dlg { background: #f2f2f2; padding: 10px; width: 520px; box-sizing: border-box; font-size: 12px; }
+  .dlg h1 { font-size: 16px; padding: 0 0 10px; }
+  .dlg .content { background: #fff; padding: 0 10px; }
+  .dlg .host { display: block; padding: 10px 0; }
+  .dlg table { min-width: 100%; border-spacing: 0; table-layout: auto; white-space: normal; }
+  .dlg th, .dlg td { padding: 0 16px; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; height: 34px; text-align: left; vertical-align: middle; }
+  .dlg th { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #666; letter-spacing: .03em; }
+  .dlg .r { text-align: right; }
+  .dlg .badge { display: inline-block; width: 16px; height: 16px; background: #a3231f; color: #fff; text-align: center; line-height: 16px; font-size: 10px; }
+  /* .bap: bid/ask price cell, as the application ships it today */
+  .bap { display: inline-flex; align-items: center; justify-content: flex-end; white-space: nowrap; }
+  .bap .sep { flex: 0 0 auto; min-width: 12px; font-size: 130%; text-align: center; user-select: none; }
+  .bap .bid { opacity: .5; }
+  /* .plain: text-only alert dialog */
+  .plain { background: #f2f2f2; padding: 10px; width: 330px; box-sizing: border-box; }
+  .plain .t { font-size: 16px; padding-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+  .plain .ic { width: 17px; height: 17px; border-radius: 50%; background: #e8a825; color: #fff; font-weight: bold; text-align: center; line-height: 17px; font-size: 12px; }
+  .plain .c { background: #fff; padding: 8px 10px; }
+  .plain .c p { margin: 6px 0; }
+  .plain .dbg { color: #8b98a4; font-size: 11px; padding-top: 6px; }
+
+  /* .wide: a row that needs more than the column, such as two dialogs side by side. Last, so it beats .row's margin. */
+  .wide { width: calc(100vw - 60px); margin-left: calc(50% - 50vw + 30px); }
+
+  @media print {
+    body { max-width: none; padding: 0; }
+    .card, .step, .callout, .mock, pre { break-inside: avoid; }
+    * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+
+  /* page-specific: one-off geometry for this page only. The library above stays as it is. */
+</style>
+</head>
+<body>
+<!--
+  Keep the section order. Delete what the page does not need, whole sections or a whole tense
+  block, and never reorder. Numbering is automatic.
+-->
+
+<h1>What the page shows, in one line</h1>
+<p class="meta">ABC-123 · <a href="https://example.com/mr/42">MR !42</a> · branch <code>feature/ABC-123-short-name</code> · commit <code>0123abc</code> · pipeline <span class="ok">success</span> · 2026-01-31</p>
+
+<!-- ================= Diagnosis ================= -->
+
+<!-- Symptom: what the user sees, as a mock-up or screenshot, then a table of where and when -->
+<h2>Symptom</h2>
+<p>One sentence naming what the user saw and where.</p>
+<div class="row">
+  <div class="card bad"><div class="cap">What the user saw</div><div class="body">
+    <div class="mock"><div class="dlg">
+      <h1>Dialog title</h1>
+      <div class="content"><div class="host"><table>
+        <tr><th>Column</th><th>Column</th><th class="r">Column</th><th>Column</th></tr>
+        <tr><td><span class="badge">S</span></td><td>Row label</td><td class="r"><span class="bap"><span class="bid">1.23</span><span class="sep">/</span><span class="ask">1.24</span></span></td><td>Value</td></tr>
+      </table></div></div>
+      <div class="actions"><button>Cancel</button><button>Confirm</button></div>
+    </div></div>
+  </div></div>
+</div>
+<table>
+  <tr><th>Where</th><th>Expected</th><th>Seen</th><th>When</th></tr>
+  <tr><td>Page or component</td><td><code>expected</code></td><td><code>actual</code></td><td>At load</td></tr>
+</table>
+
+<!-- How it went (optional): numbered, wrong turns named -->
+<h2>How it went</h2>
+<ol>
+  <li><b>First step.</b> What was checked and what it showed.</li>
+  <li><b>Wrong hypothesis.</b> What was believed, why, and what disproved it.</li>
+  <li><b>What settled it.</b> The evidence that decided the root cause.</li>
+</ol>
+
+<!-- Evidence: a table with a Data link column, so every row can be re-checked -->
+<h2>Evidence</h2>
+<table>
+  <tr><th>Time (UTC)</th><th>Record</th><th>Fields</th><th>Data</th></tr>
+  <tr><td>08:42:03</td><td><code>EventCreated</code></td><td><code>type: 6</code></td><td><a href="https://example.com/journal/1">journal</a></td></tr>
+  <tr><td>08:42:23</td><td><code>EventUpdated</code></td><td><b>no type field</b>, deltas only</td><td><a href="https://example.com/journal/2">journal</a></td></tr>
+</table>
+
+<!-- Root cause: the mechanism, as prose then a .flow -->
+<h2>Root cause</h2>
+<p>The mechanism in two or three sentences: what ran, what it assumed, what that produced.</p>
+<div class="flow">
+  <div class="step"><b>Create</b>wire <code>6</code> → <code>A</code><small>first page alerts</small></div>
+  <div class="step bad"><b>First delta</b>wire absent → <code>B</code><small>overwrites A</small></div>
+  <div class="step"><b>Second reader</b>loads <code>B</code><small>second page alerts</small></div>
+  <div class="step bad"><b>Every later delta</b>stamps <code>B</code> again<small>never recovers</small></div>
+</div>
+
+<!-- ================= Resolution · settled ================= -->
+
+<!-- The fix: before/after in two columns, then the change table by package -->
+<h2>The fix</h2>
+<div class="two">
+  <div>
+    <p><b>Before</b> · <code>path/to/file.ts</code></p>
+    <pre><code>value = map(wire);          // also on deltas</code></pre>
+  </div>
+  <div>
+    <p><b>After</b> · stamp once, leave deltas alone</p>
+    <pre><code>const next = map(wire, initial);
+if (next !== undefined) value = next;</code></pre>
+  </div>
+</div>
+<table>
+  <tr><th>Package</th><th>Change</th></tr>
+  <tr><td><code>services/bridge</code></td><td>What changed there, one line</td></tr>
+  <tr><td><code>libs/domain</code></td><td>What changed there, one line</td></tr>
+</table>
+<p class="muted">N files, +A / −B.</p>
+
+<!-- Flow after the change (optional) -->
+<h2>Flow after the change</h2>
+<div class="flow">
+  <div class="step ok"><b>Create</b>wire <code>6</code> → <code>A</code><small>both pages declare A</small></div>
+  <div class="step ok"><b>Deltas</b>type untouched<small>store keeps A</small></div>
+  <div class="step ok"><b>Downstream</b>reads A<small>no alert</small></div>
+</div>
+
+<!-- Verification: one row per check, red then green wording -->
+<h2>Verification</h2>
+<table>
+  <tr><th>Check</th><th>Result</th></tr>
+  <tr><td>New specs against the old code</td><td><span class="bad">red</span> · <code>Expected 'B' to be undefined</code></td></tr>
+  <tr><td>Same specs after the fix</td><td><span class="ok">green</span></td></tr>
+  <tr><td>Typecheck, lint, tests across touched packages</td><td><span class="ok">green</span> (18/18)</td></tr>
+  <tr><td>Pipeline 12345</td><td><span class="ok">success</span></td></tr>
+</table>
+
+<!-- Deploy order and follow-ups: the callout is the one thing an operator must not miss -->
+<h2>Deploy order and follow-ups</h2>
+<div class="callout"><b>Deploy the service before the UI.</b> Why the order matters, in one sentence.</div>
+<ul>
+  <li>Follow-up that is not in this change.</li>
+  <li>Working files to drop once merged.</li>
+</ul>
+
+<!-- Links -->
+<h2>Links</h2>
+<ul>
+  <li><a href="https://example.com/mr/42">MR !42</a></li>
+  <li><a href="https://example.com/ticket/ABC-123">ABC-123</a></li>
+</ul>
+
+<!-- ================= Resolution · proposed ================= -->
+
+<!-- What you would see: mock-up of the proposed state, beside today's where it helps -->
+<h2>What you would see</h2>
+<div class="row">
+  <div class="card ok"><div class="cap">After the change</div><div class="body">
+    <div class="mock"><div class="dlg">
+      <h1>Dialog title</h1>
+      <div class="content"><div class="host"><table>
+        <tr><th>Column</th><th>Column</th><th class="r">Column</th></tr>
+        <tr><td>Row label</td><td>Value</td><td class="r">1.23</td></tr>
+      </table></div></div>
+      <div class="actions"><button>Cancel</button><button><b>Accept anyway</b></button></div>
+    </div></div>
+  </div></div>
+  <div class="card bad"><div class="cap">Today</div><div class="body">
+    <div class="mock"><div class="plain">
+      <div class="t"><span class="ic">!</span>Warning</div>
+      <div class="c"><p>Please review the flagged rows before sending<br>Row label (identifier)</p><div class="dbg">01/31/26 05:27:10 SERVER-NAME</div></div>
+      <div class="actions"><button>Cancel</button><button>Send anyway</button></div>
+    </div></div>
+  </div></div>
+</div>
+
+<!-- The edits: one card per file, diff blocks with .add and .del lines -->
+<h2>The edits</h2>
+<div class="card"><div class="cap">Edit 1 of 2 · <code>libs/feature/src/request.ts</code></div><div class="body">
+<p class="lbl">What this edit does and why it is additive.</p>
+<pre class="diff"> export interface RequestInit {
+<span class="add">+  openDialog?: (options: DialogOptions) =&gt; Observable&lt;boolean&gt;;</span>
+ }
+<span class="del">-  return this.showDialog(data).pipe(</span>
+<span class="add">+  const open = payload.openDialog ?? ((o) =&gt; this.showDialog(o.data));
++  return open({ data }).pipe(</span></pre>
+</div></div>
+
+<!-- Flow after the change: lanes -->
+<h2>Flow after the change</h2>
+<div class="lanes">
+  <div class="lane">
+    <div class="step">Button click<span class="where">footer.component.ts</span></div>
+    <div class="arr">&darr;</div>
+    <div class="step muted">Shared flow, unchanged<span class="where">request.ts</span></div>
+    <div class="arr">&darr;</div>
+    <div class="step ok">Calls the supplied opener<span class="where">rows from the validation snapshot</span></div>
+  </div>
+  <div class="lane">
+    <h3>Why the rows can be rebuilt</h3>
+    <div class="step">Snapshot carries the flagged ids<span class="where">validation-field.ts:35</span></div>
+    <div class="arr">&darr;</div>
+    <div class="step ok">Formatter already falls back when a value is absent<span class="where">added earlier for another path</span></div>
+  </div>
+</div>
+
+<!-- Alternatives: one lane per option, rejected ones included and named as such -->
+<h2>Alternatives</h2>
+<div class="lanes">
+  <div class="lane">
+    <h3>Option 1, recommended</h3>
+    <div class="step muted">Add an optional hook to the shared flow</div>
+    <div class="arr">&darr;</div>
+    <div class="step ok">Table dialog; other callers untouched</div>
+  </div>
+  <div class="lane">
+    <h3>Option 2</h3>
+    <div class="step">Rebuild the flow in the page</div>
+    <div class="arr">&darr;</div>
+    <div class="step bad">Duplicates branching that already exists</div>
+  </div>
+  <div class="lane">
+    <h3>Option 3, rejected</h3>
+    <div class="step">Reword the plain dialog</div>
+    <div class="arr">&darr;</div>
+    <div class="step bad">Still a text dialog</div>
+  </div>
+</div>
+
+<!-- Comparison and recommendation: grid, one column per option kept; end with the recommendation -->
+<h2>Comparison and recommendation</h2>
+<table class="grid">
+  <tr><th></th><th>Option 1, hook on the shared flow</th><th>Option 2, rebuild in the page</th></tr>
+  <tr><td>Shared files touched</td><td>3, all additive</td><td class="ok">0</td></tr>
+  <tr><td>Retry, flush, logging</td><td class="ok">Kept, one implementation</td><td class="bad">Re-implemented</td></tr>
+  <tr><td>Fixes the sibling page too</td><td class="ok">One line per footer</td><td class="warn">Needs a second copy</td></tr>
+</table>
+<p><b>Recommendation.</b> Option 1, because the shared flow keeps one implementation and the page opts in with one line.</p>
+
+</body>
+</html>

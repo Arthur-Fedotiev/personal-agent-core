@@ -1,0 +1,5 @@
+interface:
+  display_name: "Explainer"
+  short_description: "Explain one ticket as a templated HTML page, PNG on request"
+policy:
+  allow_implicit_invocation: false

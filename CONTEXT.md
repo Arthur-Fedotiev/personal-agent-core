@@ -73,3 +73,32 @@ user started asking for a change, a new top-level note from someone else, a revi
 changes, or a revoked approval. Approvals granted and system notes are not items.
 _Avoid_: comment, feedback
 
+### Explainer
+
+**Explainer**:
+A single-file HTML page in the page template that explains one ticket's work: a Diagnosis, a
+Resolution, or both, in that order.
+_Avoid_: summary, report, write-up, work summary
+
+**Diagnosis**:
+The Explainer block that shows what the user sees, why it happens, and where each piece comes from.
+_Avoid_: analysis, investigation
+
+**Resolution**:
+The Explainer block that shows what changes. Always follows Diagnosis when both are present.
+_Avoid_: fix (that is one section inside a settled Resolution), solution
+
+**Tense**:
+Whether a Resolution is *settled* (the change shipped; it carries Verification and Deploy sections) or
+*proposed* (the change is a candidate; it carries Alternatives and a Recommendation).
+_Avoid_: mode, status, kind
+
+**Mock-up**:
+An HTML/CSS reproduction of real application UI inside an Explainer, built from the page template's
+component library.
+_Avoid_: screenshot (that is a captured image, not a reproduction), wireframe
+
+**Page template**:
+The one file holding an Explainer's style and section skeleton. Every Explainer is a filled copy;
+page-specific style lives in one marked block, never in the shared tokens.
+_Avoid_: theme, stylesheet, boilerplate
